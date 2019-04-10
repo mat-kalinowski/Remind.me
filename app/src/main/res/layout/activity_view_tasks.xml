@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto">
+    <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:gravity="center_horizontal"
+            android:background="@drawable/bottom_border" android:id="@+id/linearLayout" android:layout_marginTop="8dp"
+            app:layout_constraintTop_toTopOf="parent" app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp">
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" android:layout_weight="1">
+            <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_menu_revert"
+                    android:id="@+id/imageButton4" android:onClick="backToMenu"/>
+            <TextView
+                    android:text="Back"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:id="@+id/textView3" android:gravity="center"/>
+        </LinearLayout>
+        <LinearLayout
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:orientation="vertical" android:layout_weight="1">
+            <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_input_add"
+                    android:id="@+id/imageButton6" android:onClick="showTaskBar"/>
+            <TextView
+                    android:text="Add task"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:id="@+id/textView6" android:gravity="center"/>
+        </LinearLayout>
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content" android:layout_weight="1">
+            <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_menu_search"
+                    android:id="@+id/imageButton" android:onClick="showSearchBar"/>
+            <TextView
+                    android:text="Find tasks"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:id="@+id/dadasd" android:gravity="center"/>
+        </LinearLayout>
+        <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="0dp"
+                android:layout_height="match_parent" android:layout_weight="1">
+            <ImageButton
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_menu_info_details"
+                    android:id="@+id/imageButton3" android:layout_weight="1" android:onClick="showDisplayBar"/>
+            <TextView
+                    android:text="Display options"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content" android:id="@+id/display_options" android:layout_weight="1"
+                    android:gravity="center"/>
+        </LinearLayout>
+    </LinearLayout>
+    <ViewFlipper android:id="@+id/bar_holder" android:layout_width="match_parent" android:layout_height="0dp"
+                 android:visibility="gone" app:layout_constraintTop_toBottomOf="@+id/linearLayout" android:measureAllChildren="false">
+        <TableRow
+                android:id="@+id/add_bar" android:layout_width="match_parent" android:layout_height="match_parent"
+                style="@style/OperationBar" app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+            <TableLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                <TableRow android:layout_width="match_parent" android:layout_height="match_parent">
+                    <TextView
+                            android:text="ADD :"
+                            android:textSize="16sp" android:gravity="center_vertical"
+                            android:layout_width="0dp" android:layout_height="24dp"
+                            android:layout_weight="0.2"/>
+                    <android.support.design.widget.TextInputEditText
+                            android:id="@+id/task_name"
+                            android:background="@null" android:textCursorDrawable="@null"
+                            android:layout_height="wrap_content" android:layout_width="0dp"
+                            android:hint="task name" android:layout_weight="0.3"/>
+                </TableRow>
+                <TableRow
+                        android:layout_width="match_parent" android:paddingTop="8dp"
+                        android:layout_height="match_parent" android:weightSum="1">
+                    <TextView
+                            android:text="DATE:"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" android:id="@+id/textView4"
+                            android:layout_weight="0.4" android:textSize="16sp" android:gravity="center_vertical"/>
+                    <Button
+                            android:text="SELECT DATE" style="@style/GroupChoose"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content" android:id="@+id/displayDate"
+                            android:layout_weight="0.45" android:onClick="selectDate"/>
+                </TableRow>
+                <TableRow android:layout_width="match_parent" android:layout_height="match_parent" android:weightSum="1"
+                          android:paddingBottom="8dp" android:paddingTop="8dp">
+                    <TextView
+                            android:text="GROUP:"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent" android:id="@+id/textView2"
+                            android:layout_weight="0.4" android:gravity="center_vertical" android:textSize="16sp"/>
+                    <Button
+                            style="@style/GroupChoose"
+                            android:text="ZAKUPY SPOŻYWCZE"
+                            android:layout_width="0dp"
+                            android:layout_height="match_parent" android:id="@+id/group_name"
+                            android:layout_weight="0.45"
+                            android:onClick="selectGroup"/>
+                </TableRow>
+                <TableRow android:layout_width="match_parent" android:layout_height="match_parent" android:weightSum="1"
+                          android:gravity="center">
+                    <Button
+                            android:text="Submit"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content" android:id="@+id/button"
+                            android:onClick="addActivity"/>
+                </TableRow>
+            </TableLayout>
+        </TableRow>
+        <TableRow
+                android:id="@+id/search_bar" android:layout_width="match_parent" android:layout_height="wrap_content"
+                style="@style/OperationBar" app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+        >
+            <TextView
+                    android:text="SEARCH :" android:textSize="16sp" android:gravity="center"
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="0.3"/>
+            <android.support.design.widget.TextInputEditText
+                    android:background="@null" android:textCursorDrawable="@null"
+                    android:layout_height="wrap_content" android:layout_width="0dp"
+                    android:hint="group name" android:layout_weight="0.3"/>
+        </TableRow>
+        <TableRow
+                android:id="@+id/display_bar" android:layout_width="match_parent" android:layout_height="wrap_content"
+                style="@style/OperationBar" app:layout_constraintTop_toBottomOf="@+id/linearLayout">
+            <TextView
+                    android:text="FILTER BY :" android:textSize="16sp" android:gravity="center"
+                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="0.3"/>
+            <Switch
+                    android:text="Date"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content" android:id="@+id/change_display" android:textSize="16sp"
+                    android:layout_weight="0.25"
+                    android:onClick="changeFilter"/>
+        </TableRow>
+    </ViewFlipper>
+    <android.support.v7.widget.RecyclerView
+            android:id="@+id/task_recycler"
+            android:layout_width="match_parent" android:layout_height="0dp"
+            android:layout_marginBottom="8dp"
+            android:layout_marginStart="8dp" android:layout_marginEnd="8dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent" app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="8dp" app:layout_constraintTop_toBottomOf="@+id/bar_holder">
+    </android.support.v7.widget.RecyclerView>
+
+</android.support.constraint.ConstraintLayout>
+

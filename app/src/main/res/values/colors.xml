@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorAccent">@color/darkGreen</color>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+
+    <!-- green group background -->
+    <color name="darkGreen">#003e00</color>
+    <color name="lightGreen">#ffffff</color>
+
+    <!-- red group background -->
+    <color name="darkRed">#5c0504</color>
+    <color name="lightRed">#ffffff</color>
+
+    <!-- blue group background -->
+    <color name="darkBlue">#1d1e47</color>
+    <color name="lightBlue"></color>
+
+    <array name="group_colors">
+        <item>@color/darkGreen</item>
+        <item>@color/lightGreen</item>
+        <item>@color/darkRed</item>
+        <item>@color/lightRed</item>
+        <item>@color/darkBlue</item>
+        <item>@color/lightBlue</item>
+    </array>
+</resources>
