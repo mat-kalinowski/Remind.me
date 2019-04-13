@@ -80,7 +80,7 @@
                             android:layout_width="0dp" android:layout_height="24dp"
                             android:layout_weight="0.2"/>
                     <android.support.design.widget.TextInputEditText
-                            android:id="@+id/task_name"
+                            android:id="@+id/task_title"
                             android:background="@null" android:textCursorDrawable="@null"
                             android:layout_height="wrap_content" android:layout_width="0dp"
                             android:hint="task name" android:layout_weight="0.3"/>
@@ -110,7 +110,7 @@
                             style="@style/GroupChoose"
                             android:text="ZAKUPY SPOŻYWCZE"
                             android:layout_width="0dp"
-                            android:layout_height="match_parent" android:id="@+id/group_name"
+                            android:layout_height="match_parent" android:id="@+id/group_title"
                             android:layout_weight="0.45"
                             android:onClick="selectGroup"/>
                 </TableRow>

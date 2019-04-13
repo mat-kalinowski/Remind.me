@@ -22,3 +22,16 @@ fun readObject(context: Context, key: String): Any {
 
     return file_out.readObject()
 }
+
+fun <T> getStorageArray(name: String, context: Context) : ArrayList<T>{
+    var arr: ArrayList<T>
+
+    try{
+        arr = readObject(context, name) as ArrayList<T>
+    }
+    catch(ex: IOException){
+        arr = ArrayList()
+    }
+
+    return arr
+}

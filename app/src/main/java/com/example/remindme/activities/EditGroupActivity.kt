@@ -5,18 +5,18 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import com.example.remindme.models.Group
 import com.example.remindme.adapters.GroupAdapter
 import com.example.remindme.R
+import com.example.remindme.models.Task
 import com.example.remindme.utils.*
 
 import kotlinx.android.synthetic.main.activity_edit_tasks.*
-import java.io.IOException
 
 class EditGroupActivity : AppCompatActivity() {
 
 
-    private lateinit var groupList: ArrayList<Group>
+    private lateinit var groupList: ArrayList<String>
+    private lateinit var taskList: ArrayList<Task>
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: GroupAdapter
 
@@ -24,23 +24,19 @@ class EditGroupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_tasks)
 
-        try {
-            groupList = readObject(this,"GROUP_LIST") as ArrayList<Group>
-        }
-        catch(ex: IOException){
-            groupList = ArrayList()
-        }
+        groupList = getStorageArray("GROUP_LIST", this@EditGroupActivity)
+        taskList = getStorageArray("TASK_LIST", this@EditGroupActivity)
 
         layoutManager = LinearLayoutManager(this)
         group_recycler.layoutManager = layoutManager
 
-        adapter = GroupAdapter(groupList)
+        adapter = GroupAdapter(groupList, taskList)
         group_recycler.adapter = adapter
-
     }
 
     override fun onDestroy(){
         writeObject(this, "GROUP_LIST", groupList)
+        writeObject(this,"TASK_LIST", taskList)
 
         super.onDestroy()
 
@@ -58,7 +54,7 @@ class EditGroupActivity : AppCompatActivity() {
     }
 
     fun addNewGroup(v: View){
-        groupList.add(Group(new_group.text.toString()))
+        groupList.add(new_group.text.toString())
         adapter.notifyDataSetChanged()
     }
 

@@ -8,99 +8,112 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import com.example.remindme.models.Group
 import com.example.remindme.models.Task
 import com.example.remindme.utils.*
 import kotlinx.android.synthetic.main.activity_view_tasks.*
-import java.io.IOException
 import java.util.*
 import android.widget.ArrayAdapter
 import com.example.remindme.R
-import com.example.remindme.adapters.TaskDateAdapter
+import com.example.remindme.adapters.TaskAdapter
+import com.example.remindme.models.Header
+import com.example.remindme.models.ListElement
+import android.support.v7.widget.helper.ItemTouchHelper
+import com.example.remindme.adapters.RecyclerItemTouch
 
 
 class ViewTasksActivity : AppCompatActivity() {
 
     private lateinit var taskList: ArrayList<Task>
-    private lateinit var groupList: ArrayList<Group>
-    private lateinit var dateList: ArrayList<Group>
+    private lateinit var groupList: ArrayList<String>
+    private var adapterList: ArrayList<ListElement> = ArrayList()
 
     private lateinit var taskDate: Date
-    private lateinit var taskGroup: Group
+    private lateinit var taskGroup: String
 
-    private lateinit var groupAdapter: TaskDateAdapter
-    private lateinit var dateAdapter: TaskDateAdapter
+    private lateinit var adapter: TaskAdapter
     private lateinit var layoutManager: LinearLayoutManager
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_tasks)
 
-        try {
-            groupList = readObject(this,"GROUP_LIST") as ArrayList<Group>
-        }
-        catch(ex: IOException){
-            groupList = ArrayList()
-        }
-
-        try {
-            taskList = readObject(this, "TASKS_LIST") as ArrayList<Task>
-        }
-        catch(ex: IOException){
-            taskList = ArrayList()
-        }
-
-        try{
-            dateList = readObject(this, "DATE_LIST") as ArrayList<Group>
-        }
-        catch(ex: IOException){
-            dateList = ArrayList()
-        }
+        groupList = getStorageArray("GROUP_LIST", this@ViewTasksActivity)
+        taskList = getStorageArray( "TASK_LIST",this@ViewTasksActivity)
 
         layoutManager = LinearLayoutManager(this)
         task_recycler.layoutManager = layoutManager
 
-        dateAdapter = TaskDateAdapter(dateList,this)
-        groupAdapter = TaskDateAdapter(groupList,this)
-        task_recycler.adapter = dateAdapter
+        adapter = TaskAdapter(adapterList, taskList)
+        task_recycler.adapter = adapter
+
+        val itemTouchHelper = ItemTouchHelper(RecyclerItemTouch(adapter))
+        itemTouchHelper.attachToRecyclerView(task_recycler)
+
+        sortByDate()
 
     }
 
     override fun onDestroy(){
         super.onDestroy()
 
-        writeObject(this, "TASKS_LIST", taskList)
+        writeObject(this, "TASK_LIST", taskList)
         writeObject(this, "GROUP_LIST", groupList)
-        writeObject(this,"DATE_LIST", dateList)
+    }
+
+    fun sortByDate(){
+        Collections.sort(taskList){ o1, o2 -> o1.getRawDate().compareTo(o2.getRawDate()) }
+        adapterList.clear()
+
+        if(taskList.size >0){
+            adapterList.add(Header(taskList[0].getDate()))
+            adapterList.add(taskList[0])
+        }
+
+        for(i in 1 .. (taskList.size-1)){
+            if(taskList[i-1].getRawDate() != taskList[i].getRawDate()){
+                adapterList.add(Header(taskList[i].getDate()))
+            }
+            adapterList.add(taskList[i])
+        }
+
+        adapter.notifyDataSetChanged()
+    }
+
+    fun sortByGroup(){
+        Collections.sort(taskList){ o1, o2 -> o1.getGroup().compareTo(o2.getGroup()) }
+        adapterList.clear()
+
+        if(taskList.size > 0){
+            adapterList.add(Header(taskList[0].getGroup()))
+            adapterList.add(taskList[0])
+        }
+
+        for(i in 1 .. (taskList.size-1)){
+            if(taskList[i-1].getGroup() != taskList[i].getGroup()){
+                adapterList.add(Header(taskList[i].getGroup()))
+            }
+            adapterList.add(taskList[i])
+        }
+
+        adapter.notifyDataSetChanged()
     }
 
     fun addActivity(v: View){
-        val taskName = task_name.text.toString()
+        val taskName = task_title.text.toString()
         val newTask = Task(taskName, taskDate, taskGroup)
 
         taskList.add(newTask)
-
-        var dateGroup = dateList.stream().filter({ group -> group.getDate().equals(taskDate) }).findFirst().orElse(null)
-
-        if(dateGroup == null){
-            dateGroup = Group(taskDate)
-            dateList.add(dateGroup)
-            dateAdapter.addGroup(dateGroup)
-        }
-
-        dateAdapter.addTask(dateGroup,newTask)
-        groupAdapter.addTask(taskGroup, newTask)
-
+        sortByDate()
     }
 
     fun selectGroup(v: View){
         val dialogBuilder = AlertDialog.Builder(this@ViewTasksActivity)
-        val groupAdapter = ArrayAdapter<Group>(this, R.layout.dialog_item, groupList)
+        val groupAdapter = ArrayAdapter<String>(this, R.layout.dialog_item, groupList)
 
-        dialogBuilder.setTitle("Choose task group")
+        dialogBuilder.setTitle("Choose task_row group")
         dialogBuilder.setAdapter(groupAdapter, { dialogInterface: DialogInterface, i: Int ->
             taskGroup = groupList[i]
-            group_name.setText(taskGroup.toString())
+            group_title.setText(taskGroup)
         })
 
         val alert = dialogBuilder.create()
@@ -117,6 +130,17 @@ class ViewTasksActivity : AppCompatActivity() {
         }, c.get(Calendar.YEAR),c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH))
 
         datePicker.show()
+    }
+
+    fun changeFilter(v: View){
+        if(change_display.isChecked){
+            change_display.setText("Group")
+            sortByGroup()
+        }
+        else{
+            change_display.setText("Date")
+            sortByDate()
+        }
     }
 
     fun backToMenu(v: View){
@@ -151,17 +175,6 @@ class ViewTasksActivity : AppCompatActivity() {
         else{
             bar_holder.visibility = View.VISIBLE
             bar_holder.displayedChild = 0
-        }
-    }
-
-    fun changeFilter(v: View){
-        if(change_display.isChecked){
-            change_display.setText("Group")
-            task_recycler.adapter = groupAdapter
-        }
-        else{
-            change_display.setText("Date")
-            task_recycler.adapter = dateAdapter
         }
     }
 }

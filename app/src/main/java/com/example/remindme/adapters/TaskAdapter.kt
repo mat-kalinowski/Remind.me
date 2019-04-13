@@ -1,117 +1,88 @@
 package com.example.remindme.adapters
 
-import android.content.Context
-import android.support.v7.util.SortedList
 import android.support.v7.widget.RecyclerView
-import android.support.v7.widget.util.SortedListAdapterCallback
-import android.util.Log
-import android.util.TypedValue
-import android.view.Gravity
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TableRow
-import android.widget.TextView
 import com.example.remindme.R
-import com.example.remindme.models.Group
+import com.example.remindme.models.Header
+import com.example.remindme.models.ListElement
 import com.example.remindme.models.Task
 import inflate
 import kotlinx.android.synthetic.main.task_list_row.view.*
-
-class TaskDateAdapter(private val tasksContainers: List<Group>, private val appContext: Context) :
-    RecyclerView.Adapter<TaskContainerHolder>(){
-
-    private val groupSortedList: SortedList<Group>
-    private var context: Context
+import kotlinx.android.synthetic.main.task_row.view.*
 
 
-    init {
-        this.context = appContext
-        groupSortedList = SortedList(Group::class.java, object : SortedListAdapterCallback<Group>(this) {
-            override fun compare(o1: Group, o2: Group): Int = o1.getDate().compareTo(o2.getDate())
 
-            override fun areContentsTheSame(oldItem: Group, newItem: Group): Boolean = oldItem.toString().compareTo(newItem.toString()) == 0
+class TaskAdapter(private val elements : ArrayList<ListElement>, private var data : ArrayList<Task>) :
+    RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
-            override fun areItemsTheSame(item1: Group, item2: Group): Boolean = item1 == item2
-        })
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val type = getItemViewType(position)
 
-        addGroups(tasksContainers)
-    }
+        if(type == ListElement.TASK){
+            var taskHolder = holder as TaskHolder
+            var task = elements.get(position) as Task
 
-    override fun onBindViewHolder(holder: TaskContainerHolder, position: Int) {
-        val currGroup = groupSortedList[position]
-        holder.nameText.text = currGroup.toString()
+            taskHolder.name.setText(task.getName())
+            taskHolder.moreInfo.setText(task.getGroup())
+        }
+        else {
+            var headerHolder = holder as HeaderHolder
+            var header = elements.get(position) as Header
 
-        for( i in 0 .. (currGroup.getTasksSize()-1) ){
-            var row = TableRow(context)
-            var text = TextView(context)
-            var currTask = currGroup.getTask(i)
-            //var add_text = TextView(context)
-
-            row.setBackgroundResource(R.drawable.task_field)
-            row.setPadding(0,20,0,20)
-
-            //add_text.setText(currGroup.getTask(i).getDate())
-            text.setText(currTask.getName())
-            text.setTextSize(TypedValue.COMPLEX_UNIT_SP,20.0f)
-
-            row.addView(text)
-            //row.addView(add_text)
-
-            row.setOnClickListener( {
-                    currGroup.removeTask(currTask)
-                    this.notifyItemChanged(i)}
-            )
-
-            holder.groupTasks.addView(row)
+            headerHolder.nameText.setText(header.getName())
         }
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskContainerHolder {
-        val inflatedView = parent.inflate(R.layout.task_list_row, false)
-        return TaskContainerHolder(inflatedView)
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
+        var toReturn: RecyclerView.ViewHolder
 
-    override fun getItemCount() = groupSortedList.size()
-
-    fun addGroup(groups: Group) {
-       groupSortedList.add(groups)
-    }
-
-    fun addGroups(groups: List<Group>) {
-        groupSortedList.addAll(groups)
-    }
-
-    fun removeGroup(index: Int) {
-        if (groupSortedList.size() == 0) {
-            return
-        }
-        groupSortedList.remove(groupSortedList.get(index))
-    }
-
-    fun addTask(group: Group,task: Task){
-        var index = groupSortedList.indexOf(group)
-        group.addTask(task)
-
-        this.notifyItemChanged(index)
-    }
-}
-
-class TaskContainerHolder(v: View):
-    RecyclerView.ViewHolder(v), View.OnClickListener {
-
-    val nameText = v.group_name
-    val groupTasks = v.group_tasks
-
-    init {
-        v.setOnClickListener(this)
-    }
-
-    override fun onClick(v: View) {
-        if(v.group_tasks.visibility == View.GONE){
-            v.group_tasks.visibility = View.VISIBLE
+        if(viewType == ListElement.TASK){
+            val inflatedView = parent.inflate(R.layout.task_row, false)
+            toReturn = TaskHolder(inflatedView)
         }
         else{
-            v.group_tasks.visibility = View.GONE
+            val inflatedView = parent.inflate(R.layout.task_list_row, false)
+            toReturn = HeaderHolder(inflatedView)
+        }
+
+        return toReturn
+    }
+
+    fun deleteItem(position: Int) {
+        var task = elements.get(position)
+        elements.removeAt(position)
+        data.remove(task)
+        notifyItemRemoved(position)
+    }
+
+    fun deleteTaskDown(position: Int){
+        var i = position
+        elements.removeAt(position)
+        notifyItemRemoved(position)
+
+        while(i < elements.size && elements[i].getType() != ListElement.HEADER){
+            deleteItem(i)
         }
     }
+
+    override fun getItemCount() = elements.size
+
+    override fun getItemViewType(position: Int): Int {
+        return elements.get(position).getType()
+    }
+
+    class HeaderHolder(v: View): RecyclerView.ViewHolder(v){
+
+        val nameText = v.group_title
+        val mainFrame = v.main_layout
+    }
+
+    class TaskHolder(v: View) : RecyclerView.ViewHolder(v) {
+        var name = v.task_title
+        var moreInfo = v.additional_info
+
+    }
 }
+
+
