@@ -20,7 +20,6 @@ import com.example.remindme.models.ListElement
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import com.example.remindme.adapters.RecyclerItemTouch
 
 
@@ -28,7 +27,6 @@ class ViewTasksActivity : AppCompatActivity() {
 
     private lateinit var taskList: ArrayList<Task>
     private lateinit var groupList: ArrayList<String>
-    private var adapterList: ArrayList<ListElement> = ArrayList()
 
     private lateinit var taskDate: Date
     private lateinit var taskGroup: String
@@ -46,13 +44,13 @@ class ViewTasksActivity : AppCompatActivity() {
         layoutManager = LinearLayoutManager(this)
         task_recycler.layoutManager = layoutManager
 
-        adapter = TaskAdapter(adapterList, taskList)
+        adapter = TaskAdapter(taskList)
         task_recycler.adapter = adapter
 
         val itemTouchHelper = ItemTouchHelper(RecyclerItemTouch(adapter, this@ViewTasksActivity))
         itemTouchHelper.attachToRecyclerView(task_recycler)
 
-        sortByDate()
+        adapter.filterByDate()
 
         search_field.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {}
@@ -60,7 +58,7 @@ class ViewTasksActivity : AppCompatActivity() {
             override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
 
             override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
-                adapter.filterBy(p0.toString())
+                adapter.filterByText(p0.toString())
             }
         })
     }
@@ -72,50 +70,12 @@ class ViewTasksActivity : AppCompatActivity() {
         writeObject(this, "GROUP_LIST", groupList)
     }
 
-    fun sortByDate(){
-        Collections.sort(taskList){ o1, o2 -> o1.getRawDate().compareTo(o2.getRawDate()) }
-        adapterList.clear()
-
-        if(taskList.size >0){
-            adapterList.add(Header(taskList[0].getDate()))
-            adapterList.add(taskList[0])
-        }
-
-        for(i in 1 .. (taskList.size-1)){
-            if(taskList[i-1].getRawDate() != taskList[i].getRawDate()){
-                adapterList.add(Header(taskList[i].getDate()))
-            }
-            adapterList.add(taskList[i])
-        }
-
-        adapter.notifyDataSetChanged()
-    }
-
-    fun sortByGroup(){
-        Collections.sort(taskList){ o1, o2 -> o1.getGroup().compareTo(o2.getGroup()) }
-        adapterList.clear()
-
-        if(taskList.size > 0){
-            adapterList.add(Header(taskList[0].getGroup()))
-            adapterList.add(taskList[0])
-        }
-
-        for(i in 1 .. (taskList.size-1)){
-            if(taskList[i-1].getGroup() != taskList[i].getGroup()){
-                adapterList.add(Header(taskList[i].getGroup()))
-            }
-            adapterList.add(taskList[i])
-        }
-
-        adapter.notifyDataSetChanged()
-    }
-
     fun addActivity(v: View){
         val taskName = task_title.text.toString()
         val newTask = Task(taskName, taskDate, taskGroup)
 
         taskList.add(newTask)
-        sortByDate()
+        adapter.filterByDate()
     }
 
     fun selectGroup(v: View){
@@ -125,8 +85,7 @@ class ViewTasksActivity : AppCompatActivity() {
         dialogBuilder.setTitle("Choose task_row group")
         dialogBuilder.setAdapter(groupAdapter, { dialogInterface: DialogInterface, i: Int ->
             taskGroup = groupList[i]
-            group_title.setText(taskGroup)
-        })
+            group_title.setText(taskGroup) })
 
         val alert = dialogBuilder.create()
         alert.show()
@@ -136,7 +95,7 @@ class ViewTasksActivity : AppCompatActivity() {
         val c = Calendar.getInstance()
 
         val datePicker = DatePickerDialog(this, DatePickerDialog.OnDateSetListener { view, year, month, day ->
-            displayDate.text = "" + day + "/" + month + "/" + year
+            displayDate.text = "" + day + "/" + (month+1) + "/" + year
             taskDate = Date(year,month,day)
 
         }, c.get(Calendar.YEAR),c.get(Calendar.MONTH), c.get(Calendar.DAY_OF_MONTH))
@@ -147,11 +106,11 @@ class ViewTasksActivity : AppCompatActivity() {
     fun changeFilter(v: View){
         if(change_display.isChecked){
             change_display.setText("Group")
-            sortByGroup()
+            adapter.filterByGroup()
         }
         else{
             change_display.setText("Date")
-            sortByDate()
+            adapter.filterByDate()
         }
     }
 
