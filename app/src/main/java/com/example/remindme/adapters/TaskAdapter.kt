@@ -72,6 +72,19 @@ class TaskAdapter(private val elements : ArrayList<ListElement>, private var dat
         return elements.get(position).getType()
     }
 
+    fun filterBy(text: String){
+        val matchText = text.toLowerCase()
+        elements.clear()
+        elements.add(Header("Search results"))
+
+        for(i in 0.. (data.size-1)){
+            if(data[i].getName().toLowerCase().contains(matchText)){
+                elements.add(data[i])
+            }
+        }
+        this.notifyDataSetChanged()
+    }
+
     class HeaderHolder(v: View): RecyclerView.ViewHolder(v){
 
         val nameText = v.group_title

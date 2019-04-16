@@ -13,73 +13,81 @@
             android:layout_marginStart="8dp" app:layout_constraintEnd_toEndOf="parent" android:layout_marginEnd="8dp">
         <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent" android:layout_weight="1">
+                android:layout_width="0dp" android:layout_height="match_parent"
+                android:layout_weight="1" android:gravity="center" android:padding="3dp">
             <ImageButton
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_menu_revert"
-                    android:id="@+id/imageButton4" android:onClick="backToMenu"/>
+                    android:background="@drawable/bar_button_bg"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/back_white"
+                    android:onClick="backToMenu"/>
             <TextView
                     android:text="Back"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:id="@+id/textView3" android:gravity="center"/>
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:gravity="center" android:layout_marginTop="4dp" android:textSize="16sp" />
         </LinearLayout>
         <LinearLayout
                 android:orientation="vertical"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" android:layout_weight="1">
+                android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1"
+                android:gravity="center" android:padding="3dp">
             <ImageButton
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_menu_search"
+                    android:background="@drawable/bar_button_bg"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/search_white"
                     android:id="@+id/imageButton" android:onClick="searchGroup"/>
             <TextView
                     android:text="Find group"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:id="@+id/dadasd" android:gravity="center"/>
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:gravity="center" android:layout_marginTop="4dp" android:textSize="16sp" />
         </LinearLayout>
         <LinearLayout
-                android:layout_width="wrap_content" android:layout_height="wrap_content"
-                android:orientation="vertical"  android:layout_weight="1">
+                android:layout_width="0dp" android:layout_height="wrap_content"
+                android:orientation="vertical" android:layout_weight="1"
+                android:gravity="center" android:padding="3dp">
             <ImageButton
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" app:srcCompat="@android:drawable/ic_input_add"
-                    android:id="@+id/imageButton6" android:onClick="createNewGroup"/>
+                    android:background="@drawable/bar_button_bg"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    app:srcCompat="@drawable/add_white"
+                    android:onClick="createNewGroup"/>
             <TextView
                     android:text="Add group"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content" android:id="@+id/textView6" android:gravity="center"/>
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp" android:textSize="16sp" android:gravity="center"/>
         </LinearLayout>
     </LinearLayout>
     <ViewFlipper android:id="@+id/bar_holder" android:layout_width="match_parent" android:layout_height="0dp"
-                 android:visibility="visible" app:layout_constraintTop_toBottomOf="@+id/linearLayout" >
+                 android:visibility="gone" app:layout_constraintTop_toBottomOf="@+id/linearLayout"
+                 android:measureAllChildren="false">
         <TableRow
-                android:id="@+id/search_bar" android:layout_width="match_parent" android:layout_height="match_parent"
+                android:id="@+id/search_bar" android:layout_width="match_parent" android:layout_height="wrap_content"
                 style="@style/OperationBar" app:layout_constraintTop_toBottomOf="@+id/linearLayout">
             <TextView
-                    android:text="SEARCH :" android:textSize="16sp" android:gravity="center"
-                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="0.3"/>
+                    android:text="SEARCH :" style="@style/BarOptionHeader"
+                    android:layout_weight="0.3"/>
             <android.support.design.widget.TextInputEditText
                     android:background="@null" android:textCursorDrawable="@null"
                     android:layout_height="wrap_content" android:layout_width="0dp"
                     android:hint="group name" android:layout_weight="0.3"/>
         </TableRow>
-        <TableRow
+        <TableLayout
                 android:id="@+id/add_bar" android:layout_width="match_parent" android:layout_height="match_parent"
                 style="@style/OperationBar" app:layout_constraintTop_toBottomOf="@+id/linearLayout">
-            <TextView
-                    android:text="ADD :"
-                    android:textSize="16sp" android:gravity="center"
-                    android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="0.2"/>
-            <android.support.design.widget.TextInputEditText
-                    android:id="@+id/new_group"
-                    android:background="@null" android:textCursorDrawable="@null"
-                    android:layout_height="wrap_content" android:layout_width="0dp"
-                    android:hint="group name" android:layout_weight="0.3"/>
-            <ImageButton
-                    android:layout_width="0dp" android:onClick="addNewGroup"
-                    app:srcCompat="@android:drawable/ic_menu_send"
-                    android:id="@+id/imageButton2" android:layout_weight="0.2" android:layout_height="match_parent"/>
-        </TableRow>
+            <TableRow
+                    android:layout_width="match_parent" android:layout_height="match_parent">
+                <TextView
+                        android:text="ADD :" style="@style/BarOptionHeader"
+                        android:layout_weight="0.4"/>
+                <android.support.design.widget.TextInputEditText
+                        android:id="@+id/new_group" android:background="@null" android:textCursorDrawable="@null"
+                        android:layout_height="wrap_content" android:layout_width="0dp"
+                        android:hint="group name" android:layout_weight="0.6" android:textSize="20sp"/>
+            </TableRow>
+            <TableRow android:layout_width="match_parent" android:layout_height="match_parent"
+                      android:gravity="center" android:layout_marginTop="12dp">
+                <Button
+                        android:text="SUBMIT" android:layout_width="wrap_content" android:layout_height="wrap_content"
+                        android:onClick="addNewGroup" style="@style/SubmitBarButton"/>
+            </TableRow>
+        </TableLayout>
     </ViewFlipper>
     <android.support.v7.widget.RecyclerView
             android:id="@+id/group_recycler"

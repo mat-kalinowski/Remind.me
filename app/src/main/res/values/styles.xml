@@ -25,11 +25,22 @@
         <item name="android:visibility">gone</item>
     </style>
 
+    <style name="MainButton">
+        <item name="android:textColor">#003e00</item>
+        <item name="android:layout_margin">4dp</item>
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:background">@drawable/regular_button</item>
+        <item name="android:textSize">16dp</item>
+        <item name="android:layout_weight">1</item>
+        <item name="android:paddingTop">40dp</item>
+        <item name="android:paddingBottom">40dp</item>
+    </style>
     <style name="GroupChoose">
         <item name="android:textColor">@color/darkGreen</item>
         <item name="android:background">@drawable/border_button</item>
         <item name="android:gravity">center</item>
-        <item name="android:textSize">15sp</item>
+        <item name="android:textSize">16sp</item>
         <item name="android:minHeight">0dp</item>
         <item name="android:padding">6dp</item>
     </style>
@@ -37,5 +48,16 @@
         <item name="android:padding">5dp</item>
         <item name="android:layout_marginTop">4dp</item>
         <item name="android:textSize">18sp</item>
+    </style>
+    <style name="BarOptionHeader">
+        <item name="android:layout_width">0dp</item>
+        <item name="android:layout_height">match_parent</item>
+        <item name="android:paddingLeft">24dp</item>
+        <item name="android:textSize">18sp</item>
+        <item name="android:gravity">center_vertical</item>
+    </style>
+    <style name="SubmitBarButton">
+        <item name="android:background">@drawable/bar_button_bg</item>
+        <item name="android:textColor">#ffffff</item>
     </style>
 </resources>

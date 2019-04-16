@@ -18,6 +18,9 @@ import com.example.remindme.adapters.TaskAdapter
 import com.example.remindme.models.Header
 import com.example.remindme.models.ListElement
 import android.support.v7.widget.helper.ItemTouchHelper
+import android.text.Editable
+import android.text.TextWatcher
+import android.util.Log
 import com.example.remindme.adapters.RecyclerItemTouch
 
 
@@ -46,11 +49,20 @@ class ViewTasksActivity : AppCompatActivity() {
         adapter = TaskAdapter(adapterList, taskList)
         task_recycler.adapter = adapter
 
-        val itemTouchHelper = ItemTouchHelper(RecyclerItemTouch(adapter))
+        val itemTouchHelper = ItemTouchHelper(RecyclerItemTouch(adapter, this@ViewTasksActivity))
         itemTouchHelper.attachToRecyclerView(task_recycler)
 
         sortByDate()
 
+        search_field.addTextChangedListener(object : TextWatcher {
+            override fun afterTextChanged(p0: Editable?) {}
+
+            override fun beforeTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {}
+
+            override fun onTextChanged(p0: CharSequence?, p1: Int, p2: Int, p3: Int) {
+                adapter.filterBy(p0.toString())
+            }
+        })
     }
 
     override fun onDestroy(){

@@ -17,10 +17,9 @@ class GroupAdapter(private val groups: ArrayList<String>, private val tasks: Arr
         holder.removeButton.setOnClickListener{
             val delGroup = groups.get(position)
 
-            for (task in tasks){
-                Log.e("hui", "jadom")
-                if(task.getGroup().compareTo(delGroup) == 0){
-                    tasks.remove(task)
+            for (i  in (tasks.size-1) downTo 0){
+                if(tasks[i].getGroup().compareTo(delGroup) == 0){
+                    tasks.removeAt(i)
                 }
             }
 
