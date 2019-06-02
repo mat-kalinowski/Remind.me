@@ -2,35 +2,37 @@ package com.example.remindme.activities
 
 import android.app.AlertDialog
 import android.app.DatePickerDialog
+import android.arch.persistence.room.Room
 import android.content.DialogInterface
 import android.content.Intent
+import android.os.AsyncTask
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v7.widget.LinearLayoutManager
 import android.view.View
-import com.example.remindme.models.Task
-import com.example.remindme.utils.*
 import kotlinx.android.synthetic.main.activity_view_tasks.*
 import java.util.*
 import android.widget.ArrayAdapter
 import com.example.remindme.R
 import com.example.remindme.adapters.TaskAdapter
-import com.example.remindme.models.Header
-import com.example.remindme.models.ListElement
 import android.support.v7.widget.helper.ItemTouchHelper
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import com.example.remindme.adapters.RecyclerItemTouch
-
+import com.example.remindme.app_database.AppDatabase
+import com.example.remindme.app_database.Group
+import com.example.remindme.app_database.Task
+import java.lang.Exception
 
 class ViewTasksActivity : AppCompatActivity() {
 
-    private lateinit var taskList: ArrayList<Task>
-    private lateinit var groupList: ArrayList<String>
+    private var groupList: ArrayList<Group> = ArrayList()
 
     private lateinit var taskDate: Date
     private lateinit var taskGroup: String
 
+    private lateinit var dbHandler: AppDatabase
     private lateinit var adapter: TaskAdapter
     private lateinit var layoutManager: LinearLayoutManager
 
@@ -38,13 +40,25 @@ class ViewTasksActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_view_tasks)
 
-        groupList = getStorageArray("GROUP_LIST", this@ViewTasksActivity)
-        taskList = getStorageArray( "TASK_LIST",this@ViewTasksActivity)
+        AsyncTask.execute{
+            try {
+                dbHandler = Room.databaseBuilder(
+                    this,
+                    AppDatabase::class.java,
+                    "remindme.db"
+                ).build()
+            } catch (e: Exception) {
+                Log.e("DB ERROR: ", " cannot connect to database")
+                Log.e("DB ERROR: ", e.message)
+            }
+
+            groupList = dbHandler.groupDao().getAll() as ArrayList<Group>
+        }
 
         layoutManager = LinearLayoutManager(this)
         task_recycler.layoutManager = layoutManager
 
-        adapter = TaskAdapter(taskList)
+        adapter = TaskAdapter(this)
         task_recycler.adapter = adapter
 
         val itemTouchHelper = ItemTouchHelper(RecyclerItemTouch(adapter, this@ViewTasksActivity))
@@ -63,28 +77,20 @@ class ViewTasksActivity : AppCompatActivity() {
         })
     }
 
-    override fun onDestroy(){
-        super.onDestroy()
-
-        writeObject(this, "TASK_LIST", taskList)
-        writeObject(this, "GROUP_LIST", groupList)
-    }
-
     fun addActivity(v: View){
         val taskName = task_title.text.toString()
         val newTask = Task(taskName, taskDate, taskGroup)
 
-        taskList.add(newTask)
-        adapter.filterByDate()
+        adapter.addItem(newTask)
     }
 
     fun selectGroup(v: View){
         val dialogBuilder = AlertDialog.Builder(this@ViewTasksActivity)
-        val groupAdapter = ArrayAdapter<String>(this, R.layout.dialog_item, groupList)
+        val groupAdapter = ArrayAdapter<Group>(this, R.layout.dialog_item, groupList)
 
         dialogBuilder.setTitle("Choose task_row group")
         dialogBuilder.setAdapter(groupAdapter, { dialogInterface: DialogInterface, i: Int ->
-            taskGroup = groupList[i]
+            taskGroup = groupList[i].name
             group_title.setText(taskGroup) })
 
         val alert = dialogBuilder.create()

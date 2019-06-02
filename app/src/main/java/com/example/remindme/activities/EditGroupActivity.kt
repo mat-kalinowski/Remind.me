@@ -7,16 +7,14 @@ import android.support.v7.widget.LinearLayoutManager
 import android.view.View
 import com.example.remindme.adapters.GroupAdapter
 import com.example.remindme.R
-import com.example.remindme.models.Task
+import com.example.remindme.app_database.Group
+import com.example.remindme.app_database.Task
 import com.example.remindme.utils.*
 
 import kotlinx.android.synthetic.main.activity_edit_tasks.*
 
 class EditGroupActivity : AppCompatActivity() {
 
-
-    private lateinit var groupList: ArrayList<String>
-    private lateinit var taskList: ArrayList<Task>
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var adapter: GroupAdapter
 
@@ -24,22 +22,11 @@ class EditGroupActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_edit_tasks)
 
-        groupList = getStorageArray("GROUP_LIST", this@EditGroupActivity)
-        taskList = getStorageArray("TASK_LIST", this@EditGroupActivity)
-
         layoutManager = LinearLayoutManager(this)
         group_recycler.layoutManager = layoutManager
 
-        adapter = GroupAdapter(groupList, taskList)
+        adapter = GroupAdapter(this)
         group_recycler.adapter = adapter
-    }
-
-    override fun onDestroy(){
-        writeObject(this, "GROUP_LIST", groupList)
-        writeObject(this,"TASK_LIST", taskList)
-
-        super.onDestroy()
-
     }
 
     fun createNewGroup(v: View){
@@ -54,8 +41,7 @@ class EditGroupActivity : AppCompatActivity() {
     }
 
     fun addNewGroup(v: View){
-        groupList.add(new_group.text.toString())
-        adapter.notifyDataSetChanged()
+        adapter.addItem(Group(new_group.text.toString()))
     }
 
     fun searchGroup(v: View){

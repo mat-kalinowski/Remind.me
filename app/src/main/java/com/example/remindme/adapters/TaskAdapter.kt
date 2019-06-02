@@ -1,21 +1,53 @@
 package com.example.remindme.adapters
 
+import android.app.Activity
+import android.arch.persistence.room.Room
+import android.content.Context
+import android.os.AsyncTask
+import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.View
 import android.view.ViewGroup
+import com.example.remindme.MainApplication
 import com.example.remindme.R
+import com.example.remindme.app_database.AppDatabase
+import com.example.remindme.app_database.Task
 import com.example.remindme.models.Header
 import com.example.remindme.models.ListElement
-import com.example.remindme.models.Task
+import com.example.remindme.utils.getStorageArray
 import inflate
+import kotlinx.android.synthetic.main.activity_view_tasks.*
 import kotlinx.android.synthetic.main.task_list_row.view.*
 import kotlinx.android.synthetic.main.task_row.view.*
+import java.lang.Exception
 import java.util.*
 
 
-class TaskAdapter( private var data : ArrayList<Task>) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
+class TaskAdapter(var context: Context) : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
     private val elements : ArrayList<ListElement> = ArrayList()
+    private var data : ArrayList<Task> = ArrayList()
+    private var dbHandler : AppDatabase? = null
+
+    init{
+        AsyncTask.execute {
+
+            try {
+                dbHandler = Room.databaseBuilder(
+                    context,
+                    AppDatabase::class.java,
+                    "remindme.db"
+                ).build()
+            } catch (e: Exception) {
+                Log.e("DB ERROR: ", " cannot connect to database")
+                Log.e("DB ERROR: ", e.message)
+            }
+
+            data = dbHandler!!.taskDao().getAll() as ArrayList<Task>
+            (context as Activity).runOnUiThread{filterByDate()}
+        }
+    }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         val type = getItemViewType(position)
@@ -24,8 +56,8 @@ class TaskAdapter( private var data : ArrayList<Task>) : RecyclerView.Adapter<Re
             val taskHolder = holder as TaskHolder
             val task = elements.get(position) as Task
 
-            taskHolder.name.setText(task.getName())
-            taskHolder.moreInfo.setText(task.getGroup())
+            taskHolder.name.setText(task.name)
+            taskHolder.moreInfo.setText(task.group)
         }
         else {
             val headerHolder = holder as HeaderHolder
@@ -62,7 +94,7 @@ class TaskAdapter( private var data : ArrayList<Task>) : RecyclerView.Adapter<Re
         elements.add(Header("Search results"))
 
         for(i in 0.. (data.size-1)){
-            if(data[i].getName().toLowerCase().contains(matchText)){
+            if(data[i].name.toLowerCase().contains(matchText)){
                 elements.add(data[i])
             }
         }
@@ -70,17 +102,17 @@ class TaskAdapter( private var data : ArrayList<Task>) : RecyclerView.Adapter<Re
     }
 
     fun filterByGroup(){
-        Collections.sort(data){ o1, o2 -> o1.getGroup().compareTo(o2.getGroup()) }
+        Collections.sort(data){ o1, o2 -> o1.group.compareTo(o2.group) }
         elements.clear()
 
         if(data.size > 0){
-            elements.add(Header(data[0].getGroup()))
+            elements.add(Header(data[0].group))
             elements.add(data[0])
         }
 
         for(i in 1 .. (data.size-1)){
-            if(data[i-1].getGroup() != data[i].getGroup()){
-                elements.add(Header(data[i].getGroup()))
+            if(data[i-1].group != data[i].group){
+                elements.add(Header(data[i].group))
             }
             elements.add(data[i])
         }
@@ -111,6 +143,20 @@ class TaskAdapter( private var data : ArrayList<Task>) : RecyclerView.Adapter<Re
         elements.removeAt(position)
         data.remove(task)
         notifyItemRemoved(position)
+
+        AsyncTask.execute{
+            dbHandler!!.taskDao().delete(task as Task)
+        }
+    }
+
+    fun addItem(task: Task){
+        elements.add(task)
+        data.add(task)
+        filterByDate()
+
+        AsyncTask.execute{
+            task.id = dbHandler!!.taskDao().insert(task)
+        }
     }
 
     fun deleteTaskDown(position: Int){

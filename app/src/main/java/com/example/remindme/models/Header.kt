@@ -4,7 +4,7 @@ import com.example.remindme.models.ListElement.Companion.HEADER
 
 class Header(name: String) : ListElement {
 
-    private lateinit var name : String
+    private var name : String
 
     init{
         this.name = name
